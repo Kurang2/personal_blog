@@ -1,52 +1,51 @@
 <?php
-// File: /includes/header.php
-$site_title = get_setting('site_title');
-$site_desc = get_setting('site_description');
-$categories_menu_sql = "SELECT nama_kategori, slug FROM categories ORDER BY nama_kategori ASC";
-$categories_menu_result = $conn->query($categories_menu_sql);
-?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($page_title) ? htmlspecialchars($page_title) . ' - ' . htmlspecialchars($site_title) : htmlspecialchars($site_title); ?></title>
-    <meta name="description" content="<?= isset($meta_description) ? htmlspecialchars($meta_description) : htmlspecialchars($site_desc); ?>">
-    
-    <!-- ================================================== -->
-    <!-- == PERBAIKAN DI SINI: Path ke file CSS diperbaiki == -->
-    <!-- ================================================== -->
-    <link rel="stylesheet" href="personal_blog/assets/css/style.css">
+// File: /admin/index.php
 
-</head>
-<body>
-    <header class="main-header">
-        <div class="container header-flex">
-            <div class="logo">
-                <a href="/personal_blog/index.php"><?= htmlspecialchars($site_title) ?></a>
-            </div>
-            <nav class="main-nav">
-                <ul>
-                    <?php if ($categories_menu_result && $categories_menu_result->num_rows > 0): ?>
-                        <?php while($cat = $categories_menu_result->fetch_assoc()): ?>
-                        <li><a href="/personal_blog/category.php?slug=<?= htmlspecialchars($cat['slug']) ?>"><?= htmlspecialchars($cat['nama_kategori']) ?></a></li>
-                        <?php endwhile; ?>
-                    <?php endif; ?>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <form action="/personal_blog/search.php" method="GET" class="search-form">
-                    <input type="search" name="q" placeholder="Cari artikel..." required>
-                    <button type="submit">Cari</button>
-                </form>
-                <?php if (is_logged_in()): ?>
-                    <a href="/personal_blog/admin/index.php" class="auth-button">Dashboard</a>
-                    <a href="/personal_blog/logout.php" class="auth-button">Keluar</a>
-                <?php else: ?>
-                    <a href="/personal_blog/login.php" class="auth-button">Masuk</a>
-                    <a href="/personal_blog/register.php" class="auth-button register">Daftar</a>
-                <?php endif; ?>
-            </div>
-            <button class="mobile-menu-toggle">MENU</button>
+// PERBAIKAN: Path ini sekarang akan benar setelah Anda memindahkan file check_auth.php
+require_once __DIR__ . '/includes/check_auth.php';
+
+$page_title = "Dashboard";
+include __DIR__ . '/includes/admin_header.php';
+
+$total_posts = $conn->query("SELECT COUNT(id) FROM posts")->fetch_row()[0];
+$total_users = $conn->query("SELECT COUNT(id) FROM users")->fetch_row()[0];
+$pending_posts = $conn->query("SELECT COUNT(id) FROM posts WHERE status = 'pending'")->fetch_row()[0];
+?>
+
+<div class="admin-container">
+    <h1>Selamat Datang, <?= htmlspecialchars($_SESSION['user_nama_lengkap']); ?>!</h1>
+    <p>Anda login sebagai: <strong><?= htmlspecialchars($_SESSION['user_role']); ?></strong></p>
+
+    <?php if (isset($_SESSION['success_message'])): ?>
+        <div class="alert alert-success"><?= $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="alert alert-danger"><?= $_SESSION['error_message']; unset($_SESSION['error_message']); ?></div>
+    <?php endif; ?>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h2>Total Postingan</h2>
+            <p><?= $total_posts ?></p>
         </div>
-    </header>
+        <div class="stat-card">
+            <h2>Menunggu Persetujuan</h2>
+            <p><?= $pending_posts ?></p>
+        </div>
+        <div class="stat-card">
+            <h2>Total Pengguna</h2>
+            <p><?= $total_users ?></p>
+        </div>
+    </div>
+
+    <h2>Akses Cepat</h2>
+    <div class="quick-links">
+        <a href="post_form.php" class="button">Tulis Artikel Baru</a>
+        <a href="manage_posts.php" class="button">Kelola Semua Postingan</a>
+    </div>
+
+</div>
+
+<?php
+include __DIR__ . '/includes/admin_footer.php';
+?>
