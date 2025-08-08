@@ -1,5 +1,6 @@
 <?php
 // File: /admin/includes/admin_header.php
+$base_url = '/personal_blog'; // Ganti ini jika nama folder Anda berbeda
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -7,17 +8,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($page_title) ? htmlspecialchars($page_title) : 'Admin Panel' ?> - <?= htmlspecialchars(get_setting('site_title')) ?></title>
-    <link rel="stylesheet" href="/personal_blog/assets/css/style.css">
+    
+    <!-- PERBAIKAN: Path CSS dinamis -->
+    <link rel="stylesheet" href="<?= $base_url ?>/assets/css/style.css">
 </head>
 <body class="admin-body">
     <header class="admin-header">
         <div class="container">
             <div class="admin-header-logo">
-                <a href="/personal_blog/admin/index.php">Admin Panel</a>
+                <a href="<?= $base_url ?>/admin/index.php">Admin Panel</a>
             </div>
             <div class="admin-header-user">
                 <span>Selamat datang, <strong><?= htmlspecialchars($_SESSION['user_nama_lengkap']) ?></strong></span>
-                <a href="/personal_blog/logout.php" class="button button-logout">Keluar</a>
+                <a href="<?= $base_url ?>/logout.php" class="button button-logout">Keluar</a>
             </div>
         </div>
     </header>
